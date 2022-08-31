@@ -1,29 +1,56 @@
 const router = require("koa-router")();
 
+const mongoose = require("mongoose");
+
+const Model = require("../mongo-server/models");
+
 function useRouter(app) {
-  router.get("/", (ctx, next) => {
+  router.get("/", async (ctx, next) => {
     ctx.body = "hello";
   });
-  router.post("/addUser", (ctx, next) => {
-    ctx.body = "addUser";
-  });
-  router.get("/getUserList", (ctx, next) => {
-    ctx.body = [{ name: "junger " }];
-  });
-  router.get("/gerUserDetail", (ctx, next) => {
-    ctx.body = {
-      id: `${ctx.request.query.id}`,
-      name: "jungeer",
-    };
+
+  /**
+   * 新增用户
+   */
+  router.post("/addUser", async (ctx, next) => {
+    await next();
+    const user = new Model.User(ctx.request.body);
+    const saveResult = await user.save();
+    ctx.body = saveResult ? "success" : "fail";
   });
 
-  app.use(router.routes()); // 启动路由
   /**
-   * 作用
-   * 是官方文档的推荐用法,我们可以看到router.allowedMethods()
-   * 用在了路由匹配router.routes()之后,
-   * 所以在当所有路由中间件最后调用.此时根据ctx.status设置response响应头
+   * 获取用户列表
    */
+  router.get("/getUserList", async (ctx, next) => {
+    ctx.body = await Model.User.find();
+  });
+
+  /**
+   * 根据 userId 获取用户详情
+   */
+  router.get("/gerUserDetailByUserId", async (ctx, next) => {
+    const userId = ctx.request.query.userId;
+    if (mongoose.isValidObjectId(userId)) {
+      ctx.body = await Model.User.find({ _id: userId });
+      return;
+    }
+    ctx.body = "不是一个合法的 userID";
+  });
+
+  /**
+   * 根据 userId 删除用户
+   */
+  router.delete("/deleteUserByUserId", async (ctx, next) => {
+    const userId = ctx.request.query.userId;
+    if (mongoose.isValidObjectId(userId)) {
+      ctx.body = await Model.User.remove({ _id: userId });
+      return;
+    }
+    ctx.body = "不是一个合法的 userID";
+  });
+
+  app.use(router.routes());
   app.use(router.allowedMethods());
 }
 
