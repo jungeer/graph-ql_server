@@ -33,7 +33,7 @@ const resolvers = {
       return await Model.User.find({});
     },
     getUserDetailByUserId: async (parent, { userId }, context, info) => {
-      return await Model.User.find({ userId });
+      return await Model.User.findOne({ userId });
     },
   },
   Mutation: {

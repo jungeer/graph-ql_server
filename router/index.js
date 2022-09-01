@@ -31,7 +31,11 @@ function useRouter(app) {
    */
   router.get("/gerUserDetailByUserId", async (ctx, next) => {
     const userId = ctx.request.query.userId;
-    ctx.body = await Model.User.find({ userId });
+    if (userId) {
+      ctx.body = await Model.User.findOne({ userId });
+      return;
+    }
+    ctx.body = "不是一个合法的 userID";
     // if (mongoose.isValidObjectId(userId)) {
     //   ctx.body = await Model.User.find({ userId });
     //   return;
@@ -44,7 +48,11 @@ function useRouter(app) {
    */
   router.delete("/deleteUserByUserId", async (ctx, next) => {
     const userId = ctx.request.query.userId;
-    ctx.body = await Model.User.remove({ userId });
+    if (userId) {
+      ctx.body = await Model.User.remove({ userId });
+      return;
+    }
+    ctx.body = "不是一个合法的 userID";
     // if (mongoose.isValidObjectId(userId)) {
     //   ctx.body = await Model.User.remove({ userId });
     //   return;
