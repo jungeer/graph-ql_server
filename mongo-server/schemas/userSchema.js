@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
  */
 const UserSchema = new mongoose.Schema({
   // userId: mongoose.Schema.Types.ObjectId,
+  userId: { type: String, required: true },
   userName: { type: String, required: true },
   userAge: { type: Number, min: 1, max: 65 },
   userAddress: String,
